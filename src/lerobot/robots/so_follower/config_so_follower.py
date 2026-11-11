@@ -40,6 +40,9 @@ class SOFollowerConfig:
 
     # Set to `True` for backward compatibility with previous policies/dataset
     use_degrees: bool = True
+    
+    fsr_port: str | None = None
+    fsr_baudrate: int = 115200
 
     # Position-mode PID gains written to Feetech STS3215 motors at connect time.
     position_p_coefficient: int = 16

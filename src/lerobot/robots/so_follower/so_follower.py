@@ -23,6 +23,7 @@ from lerobot.lerobot_types import RobotAction, RobotObservation
 from lerobot.motors import Motor, MotorNormMode, SerialMotorsBus
 from lerobot.utils.decorators import check_if_already_connected, check_if_not_connected
 
+from .fsr_reader import FSRReader
 from ..robot import Robot
 from ..utils import ensure_safe_goal_position
 from .config_so_follower import SOFollowerRobotConfig
@@ -79,6 +80,7 @@ class SOFollower(Robot):
             calibration=self.calibration,
         )
         self.cameras = make_cameras_from_configs(config.cameras)
+        self.fsr = FSRReader(config.fsr_port, config.fsr_baudrate) if config.fsr_port else None
 
     @property
     def _motors_ft(self) -> dict[str, type]:
@@ -97,8 +99,9 @@ class SOFollower(Robot):
 
     @cached_property
     def observation_features(self) -> dict[str, type | tuple]:
-        return {**self._motors_ft, **self._cameras_ft}
-
+        fsr_ft = {"fsr_small": float, "fsr_large": float} if self.fsr else {}
+        return {**self._motors_ft, **self._cameras_ft, **fsr_ft}
+        
     @cached_property
     def action_features(self) -> dict[str, type]:
         return self._motors_ft
@@ -123,6 +126,9 @@ class SOFollower(Robot):
 
         for cam in self.cameras.values():
             cam.connect()
+        
+        if self.fsr:
+            self.fsr.connect()
 
         self.configure()
         logger.info(f"{self} connected.")
@@ -182,6 +188,9 @@ class SOFollower(Robot):
                 dt_ms = (time.perf_counter() - start) * 1e3
                 logger.debug(f"{self} read {cam_key} depth: {dt_ms:.1f}ms")
 
+        if self.fsr:
+            obs_dict.update(self.fsr.read())
+            
         return obs_dict
 
     @check_if_not_connected
@@ -217,6 +226,8 @@ class SOFollower(Robot):
         self.bus.disconnect(self.config.disable_torque_on_disconnect)
         for cam in self.cameras.values():
             cam.disconnect()
+        if self.fsr:
+            self.fsr.disconnect()
 
         logger.info(f"{self} disconnected.")
 

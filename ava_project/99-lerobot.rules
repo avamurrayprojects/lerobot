@@ -1,0 +1,8 @@
+# Cameras
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="0bda", ATTRS{serial}=="200901010001", ATTR{index}=="0", SYMLINK+="cam_gripper"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{serial}=="F94EB89F", ATTR{index}=="0", SYMLINK+="cam_scene"
+# Arms (confirmed by unplugging the leader)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{serial}=="5B7B014041", SYMLINK+="arm_follower"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{serial}=="5B7B014701", SYMLINK+="arm_leader"
+# FSR board (Arduino Nano ESP32)
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0070", ATTRS{serial}=="E8F60AC088D4", SYMLINK+="fsr"
