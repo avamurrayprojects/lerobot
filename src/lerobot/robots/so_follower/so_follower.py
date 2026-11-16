@@ -137,7 +137,7 @@ class SOFollower(Robot):
 
         print(_HOMING_POSITION_DIAGRAM)
         print("Video walkthrough: https://huggingface.co/docs/lerobot/main/en/so101#calibration-video")
-        self.calibration = self.bus.record_calibration("position", full_turn_motors=["wrist_roll"])
+        self.calibration = self.bus.record_calibration("position", full_turn_motors=[])
         self.bus.write_calibration(self.calibration)
         self._save_calibration()
         print("Calibration saved to", self.calibration_fpath)
